@@ -36,7 +36,7 @@ basicauth_credentials:
 services:
   ## Open Auth routes
   - name: auth-v1-open
-    url: http://$AUTH_HOST:9999/verify
+    url: http://$AUTH_HOST:9999/
     routes:
       - name: auth-v1-open
         strip_path: false
