@@ -34,41 +34,208 @@ basicauth_credentials:
 ### API Routes
 ###
 services:
-  ## GoTrue: /auth/v1/* -> http://auth:9999/*
-  - name: auth-service-go-true # Renamed for clarity
-    url: http://$AUTH_HOST:9999 # This is the base URL of your GoTrue service
+  ## Open Auth routes
+  - name: auth-v1-open
+    url: http://$AUTH_HOST:9999/verify
     routes:
-      # Route for public auth endpoints (verify, signup, magiclink, etc.)
-      - name: auth-public-routes
+      - name: auth-v1-open
+        strip_path: true
         paths:
-          - /auth/v1/verify # Specific public paths for clarity
-          - /auth/v1/signup
-          - /auth/v1/magiclink
-          # Add any other paths that should NOT require auth here
-        strip_path: false # <<--- KEEP THIS FALSE! GoTrue needs the full path.
-        # No plugins defined here, so it inherits from service.
-        # But for public routes, you MUST explicitly disable auth plugins.
-        plugins: # Explicitly disable auth for these routes
-          - name: cors # Keep CORS for frontend
-          - name: key-auth
-            enabled: false # Disable key-auth for these specific paths
-          - name: acl
-            enabled: false # Disable ACL for these specific paths
+          - /auth/v1/verify
+    plugins:
+      - name: cors
+  - name: auth-v1-open-callback
+    url: http://$AUTH_HOST:9999/callback
+    routes:
+      - name: auth-v1-open-callback
+        strip_path: true
+        paths:
+          - /auth/v1/callback
+    plugins:
+      - name: cors
+  - name: auth-v1-open-authorize
+    url: http://$AUTH_HOST:9999/authorize
+    routes:
+      - name: auth-v1-open-authorize
+        strip_path: true
+        paths:
+          - /auth/v1/authorize
+    plugins:
+      - name: cors
 
-      # Route for all other secure auth endpoints (/auth/v1/token, /auth/v1/user, etc.)
-      - name: auth-secure-routes
+  ## Secure Auth routes
+  - name: auth-v1
+    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
+    url: http://$AUTH_HOST:9999/
+    routes:
+      - name: auth-v1-all
+        strip_path: true
         paths:
-          - /auth/v1/ # This means any path starting with /auth/v1/
-        strip_path: false # <<--- KEEP THIS FALSE!
-        service: auth-service-go-true # Ensure it points to this service
-        plugins:
-          - name: cors # Keep CORS
-          - name: key-auth # Re-enable key-auth for secure paths
-            config:
-              hide_credentials: false
-          - name: acl # Re-enable ACL for secure paths
-            config:
-              hide_groups_header: true
-              allow:
-                - admin
-                - anon
+          - /auth/v1/
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+
+  ## Secure REST routes
+  - name: rest-v1
+    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
+    url: http://$REST_HOST:3000/
+    routes:
+      - name: rest-v1-all
+        strip_path: true
+        paths:
+          - /rest/v1/
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: true
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+
+  ## Secure GraphQL routes
+  - name: graphql-v1
+    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
+    url: http://$REST_HOST:3000/rpc/graphql
+    routes:
+      - name: graphql-v1-all
+        strip_path: true
+        paths:
+          - /graphql/v1
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: true
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - Content-Profile:graphql_public
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+
+  ## Secure Realtime routes
+  - name: realtime-v1-ws
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    url: http://$REALTIME_HOST:4000/socket
+    protocol: ws
+    routes:
+      - name: realtime-v1-ws
+        strip_path: true
+        paths:
+          - /realtime/v1/
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+  - name: realtime-v1-rest
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    url: http://$REALTIME_HOST:4000/api
+    protocol: http
+    routes:
+      - name: realtime-v1-rest
+        strip_path: true
+        paths:
+          - /realtime/v1/api
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+  # ## Storage routes: the storage server manages its own auth
+  # - name: storage-v1
+  #   _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
+  #   url: http://storage:5000/
+  #   routes:
+  #     - name: storage-v1-all
+  #       strip_path: true
+  #       paths:
+  #         - /storage/v1/
+  #   plugins:
+  #     - name: cors
+
+  # ## Edge Functions routes
+  # - name: functions-v1
+  #   _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
+  #   url: http://functions:9000/
+  #   routes:
+  #     - name: functions-v1-all
+  #       strip_path: true
+  #       paths:
+  #         - /functions/v1/
+  #   plugins:
+  #     - name: cors
+
+  ## Analytics routes
+  - name: analytics-v1
+    _comment: 'Analytics: /analytics/v1/* -> http://analytics:4000/*'
+    url: http://$ANALYTICS_HOST:4000/
+    routes:
+      - name: analytics-v1-all
+        strip_path: true
+        paths:
+          - /analytics/v1/
+
+  ## Secure Database routes
+  - name: meta
+    _comment: 'pg-meta: /pg/* -> http://meta:8080/*'
+    url: http://$META_HOST:8080/
+    routes:
+      - name: meta-all
+        strip_path: true
+        paths:
+          - /pg/
+    plugins:
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+
+  ## Protected Dashboard - catch all remaining routes
+  - name: dashboard
+    _comment: 'Studio: /* -> http://studio:3000/*'
+    url: http://$STUDIO_HOST:3000/
+    routes:
+      - name: dashboard-all
+        strip_path: true
+        paths:
+          - /
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true
