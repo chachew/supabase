@@ -39,7 +39,7 @@ services:
     url: http://$AUTH_HOST:9999/verify
     routes:
       - name: auth-v1-open
-        strip_path: true
+        strip_path: false
         paths:
           - /auth/v1/verify
     plugins:
@@ -48,7 +48,7 @@ services:
     url: http://$AUTH_HOST:9999/callback
     routes:
       - name: auth-v1-open-callback
-        strip_path: true
+        strip_path: false
         paths:
           - /auth/v1/callback
     plugins:
@@ -57,7 +57,7 @@ services:
     url: http://$AUTH_HOST:9999/authorize
     routes:
       - name: auth-v1-open-authorize
-        strip_path: true
+        strip_path: false
         paths:
           - /auth/v1/authorize
     plugins:
@@ -69,14 +69,14 @@ services:
     url: http://$AUTH_HOST:9999/
     routes:
       - name: auth-v1-all
-        strip_path: true
+        strip_path: false
         paths:
           - /auth/v1/
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: false
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: false
       # - name: acl
       #   config:
       #     hide_groups_header: true
@@ -90,14 +90,14 @@ services:
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
-        strip_path: true
+        strip_path: false
         paths:
           - /rest/v1/
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: true
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: true
       # - name: acl
       #   config:
       #     hide_groups_header: true
@@ -111,14 +111,14 @@ services:
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
-        strip_path: true
+        strip_path: false
         paths:
           - /graphql/v1
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: true
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: true
       - name: request-transformer
         config:
           add:
@@ -138,14 +138,14 @@ services:
     protocol: ws
     routes:
       - name: realtime-v1-ws
-        strip_path: true
+        strip_path: false
         paths:
           - /realtime/v1/
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: false
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: false
       # - name: acl
       #   config:
       #     hide_groups_header: true
@@ -158,14 +158,14 @@ services:
     protocol: http
     routes:
       - name: realtime-v1-rest
-        strip_path: true
+        strip_path: false
         paths:
           - /realtime/v1/api
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: false
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: false
       # - name: acl
       #   config:
       #     hide_groups_header: true
@@ -178,7 +178,7 @@ services:
   #   url: http://storage:5000/
   #   routes:
   #     - name: storage-v1-all
-  #       strip_path: true
+  #       strip_path: false
   #       paths:
   #         - /storage/v1/
   #   plugins:
@@ -190,7 +190,7 @@ services:
   #   url: http://functions:9000/
   #   routes:
   #     - name: functions-v1-all
-  #       strip_path: true
+  #       strip_path: false
   #       paths:
   #         - /functions/v1/
   #   plugins:
@@ -202,7 +202,7 @@ services:
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
-        strip_path: true
+        strip_path: false
         paths:
           - /analytics/v1/
 
@@ -212,18 +212,18 @@ services:
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
-        strip_path: true
+        strip_path: false
         paths:
           - /pg/
     plugins:
-      - name: key-auth
-        config:
-          hide_credentials: false
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
+      # - name: key-auth
+      #   config:
+      #     hide_credentials: false
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
@@ -231,7 +231,7 @@ services:
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
-        strip_path: true
+        strip_path: false
         paths:
           - /
     plugins:
