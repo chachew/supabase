@@ -49,16 +49,17 @@ services:
           - /auth/v1/magiclink
           # Add any other specific auth paths that should NOT require authentication here
         strip_path: false # Crucial: Kong passes the full path to GoTrue
-        plugins: # Explicitly disable auth plugins for these specific routes
+        plugins: # <<--- ONLY list plugins that ARE active for this route
           - name: cors # Keep CORS for frontend
-          - name: key-auth
-            enabled: false # Disable key-auth for these public paths
-          - name: acl
-            enabled: false # Disable ACL for these public paths
+          # REMOVED: key-auth and acl from this list entirely, because they are disabled for this route
+          # - name: key-auth
+          #   enabled: false
+          # - name: acl
+          #   enabled: false
 
       # MODIFIED EXISTING ROUTE: For all other /auth/v1/ paths (that need authentication)
       - name: auth-v1-all
-        strip_path: false # <<--- CHANGED THIS FROM 'true'
+        strip_path: false # CHANGED THIS FROM 'true'
         paths:
           - /auth/v1/ # This general path will catch all other /auth/v1/ sub-paths
         plugins:
