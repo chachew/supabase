@@ -36,10 +36,10 @@ basicauth_credentials:
 services:
   ## Open Auth routes
   - name: auth-v1-open
-    url: http://$AUTH_HOST:9999/
+    url: http://$AUTH_HOST:9999/verify
     routes:
       - name: auth-v1-open
-        strip_path: false
+        strip_path: true
         paths:
           - /auth/v1/verify
     plugins:
@@ -236,6 +236,6 @@ services:
           - /
     plugins:
       - name: cors
-      - name: basic-auth
-        config:
-          hide_credentials: true
+      # - name: basic-auth
+      #   config:
+      #     hide_credentials: true
