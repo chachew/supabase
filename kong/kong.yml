@@ -77,12 +77,12 @@ services:
       - name: key-auth
         config:
           hide_credentials: false
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
+      #       - anon
 
   ## Secure REST routes
   - name: rest-v1
@@ -98,12 +98,12 @@ services:
       - name: key-auth
         config:
           hide_credentials: true
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
+      #       - anon
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -124,12 +124,12 @@ services:
           add:
             headers:
               - Content-Profile:graphql_public
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
+      #       - anon
 
   ## Secure Realtime routes
   - name: realtime-v1-ws
@@ -146,12 +146,12 @@ services:
       - name: key-auth
         config:
           hide_credentials: false
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
+      #       - anon
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/api
@@ -166,12 +166,12 @@ services:
       - name: key-auth
         config:
           hide_credentials: false
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+      # - name: acl
+      #   config:
+      #     hide_groups_header: true
+      #     allow:
+      #       - admin
+      #       - anon
   # ## Storage routes: the storage server manages its own auth
   # - name: storage-v1
   #   _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
