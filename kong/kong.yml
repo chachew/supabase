@@ -1,4 +1,4 @@
-_format_version: "2.1"
+_format_version: '2.1'
 _transform: true
 
 ###
@@ -36,40 +36,28 @@ basicauth_credentials:
 services:
   ## Open Auth routes
   - name: auth-v1-open
-    # CHANGE START: Make url point to the base of GoTrue, not a specific endpoint
-    url: http://$AUTH_HOST:9999/ # Was: url: http://$AUTH_HOST:9999/verify
-    # CHANGE END
+    url: http://$AUTH_HOST:9999/verify
     routes:
       - name: auth-v1-open
-        # CHANGE START: Change strip_path to false
-        strip_path: false # Was: strip_path: true
-        # CHANGE END
+        strip_path: false
         paths:
           - /auth/v1/verify
     plugins:
       - name: cors
   - name: auth-v1-open-callback
-    # CHANGE START: Make url point to the base of GoTrue
-    url: http://$AUTH_HOST:9999/ # Was: url: http://$AUTH_HOST:9999/callback
-    # CHANGE END
+    url: http://$AUTH_HOST:9999/callback
     routes:
       - name: auth-v1-open-callback
-        # CHANGE START: Change strip_path to false
-        strip_path: false # Was: strip_path: true
-        # CHANGE END
+        strip_path: true
         paths:
           - /auth/v1/callback
     plugins:
       - name: cors
   - name: auth-v1-open-authorize
-    # CHANGE START: Make url point to the base of GoTrue
-    url: http://$AUTH_HOST:9999/ # Was: url: http://$AUTH_HOST:9999/authorize
-    # CHANGE END
+    url: http://$AUTH_HOST:9999/authorize
     routes:
       - name: auth-v1-open-authorize
-        # CHANGE START: Change strip_path to false
-        strip_path: false # Was: strip_path: true
-        # CHANGE END
+        strip_path: true
         paths:
           - /auth/v1/authorize
     plugins:
@@ -77,18 +65,13 @@ services:
 
   ## Secure Auth routes
   - name: auth-v1
-    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
+    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
     url: http://$AUTH_HOST:9999/
     routes:
       - name: auth-v1-all
-        # CHANGE START: Change strip_path to false
-        strip_path: false # Was: strip_path: true
-        # CHANGE END
-        # CHANGE START: Update path to clearly be a prefix match for subpaths
-        # This is important to ensure it catches /auth/v1/token, /auth/v1/user etc.
+        strip_path: true
         paths:
-          - /auth/v1/ # This matches /auth/v1 and anything after it.
-        # CHANGE END
+          - /auth/v1/
     plugins:
       - name: cors
       - name: key-auth
@@ -103,7 +86,7 @@ services:
 
   ## Secure REST routes
   - name: rest-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
+    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
@@ -124,7 +107,7 @@ services:
 
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
+    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
@@ -150,7 +133,7 @@ services:
 
   ## Secure Realtime routes
   - name: realtime-v1-ws
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/socket
     protocol: ws
     routes:
@@ -166,11 +149,11 @@ services:
       - name: acl
         config:
           hide_groups_header: true
-        allow:
-          - admin
-          - anon
+          allow:
+            - admin
+            - anon
   - name: realtime-v1-rest
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/api
     protocol: http
     routes:
@@ -215,7 +198,7 @@ services:
 
   ## Analytics routes
   - name: analytics-v1
-    _comment: "Analytics: /analytics/v1/* -> http://analytics:4000/*"
+    _comment: 'Analytics: /analytics/v1/* -> http://analytics:4000/*'
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
@@ -225,7 +208,7 @@ services:
 
   ## Secure Database routes
   - name: meta
-    _comment: "pg-meta: /pg/* -> http://meta:8080/*"
+    _comment: 'pg-meta: /pg/* -> http://meta:8080/*'
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
@@ -244,7 +227,7 @@ services:
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
-    _comment: "Studio: /* -> http://studio:3000/*"
+    _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
