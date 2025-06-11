@@ -1,4 +1,4 @@
-_format_version: "2.1"
+_format_version: '2.1'
 _transform: true
 
 ###
@@ -34,53 +34,63 @@ basicauth_credentials:
 ### API Routes
 ###
 services:
-  ## GoTrue: /auth/v1/* -> http://auth:9999/*
-  - name: auth-v1 # This service will now handle ALL /auth/v1/ routes
-    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
-    url: http://$AUTH_HOST:9999/ # Base URL for GoTrue
+  ## Open Auth routes
+  - name: auth-v1-open
+    url: http://$AUTH_HOST:9999/verify
     routes:
-      # NEW ROUTE: For public/unauthenticated auth paths (like /verify, /signup, /magiclink)
-      # This route MUST be defined *before* the more general 'auth-v1-all' route below,
-      # so it gets matched first for these specific public paths.
-      - name: auth-v1-public-unauth
+      - name: auth-v1-open
+        strip_path: true
         paths:
-          - /auth/v1/verify # Explicitly list public paths
-          - /auth/v1/signup
-          - /auth/v1/magiclink
-          # Add any other specific auth paths that should NOT require authentication here
-        strip_path: false # Crucial: Kong passes the full path to GoTrue
-        plugins: # <<--- ONLY list plugins that ARE active for this route
-          - name: cors # Keep CORS for frontend
-          # REMOVED: key-auth and acl from this list entirely, because they are disabled for this route
-          # - name: key-auth
-          #   enabled: false
-          # - name: acl
-          #   enabled: false
+          - /auth/v1/verify
+    plugins:
+      - name: cors
+  - name: auth-v1-open-callback
+    url: http://$AUTH_HOST:9999/callback
+    routes:
+      - name: auth-v1-open-callback
+        strip_path: true
+        paths:
+          - /auth/v1/callback
+    plugins:
+      - name: cors
+  - name: auth-v1-open-authorize
+    url: http://$AUTH_HOST:9999/authorize
+    routes:
+      - name: auth-v1-open-authorize
+        strip_path: true
+        paths:
+          - /auth/v1/authorize
+    plugins:
+      - name: cors
 
-      # MODIFIED EXISTING ROUTE: For all other /auth/v1/ paths (that need authentication)
+  ## Secure Auth routes
+  - name: auth-v1
+    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
+    url: http://$AUTH_HOST:9999/
+    routes:
       - name: auth-v1-all
-        strip_path: false # CHANGED THIS FROM 'true'
+        strip_path: true
         paths:
-          - /auth/v1/ # This general path will catch all other /auth/v1/ sub-paths
-        plugins:
-          - name: cors
-          - name: key-auth # These plugins remain active for this general route
-            config:
-              hide_credentials: false
-          - name: acl
-            config:
-              hide_groups_header: true
-              allow:
-                - admin
-                - anon
+          - /auth/v1/
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
 
   ## Secure REST routes
   - name: rest-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
+    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /rest/v1/
     plugins:
@@ -97,11 +107,11 @@ services:
 
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
+    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /graphql/v1
     plugins:
@@ -123,12 +133,12 @@ services:
 
   ## Secure Realtime routes
   - name: realtime-v1-ws
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/socket
     protocol: ws
     routes:
       - name: realtime-v1-ws
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /realtime/v1/
     plugins:
@@ -143,12 +153,12 @@ services:
             - admin
             - anon
   - name: realtime-v1-rest
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/api
     protocol: http
     routes:
       - name: realtime-v1-rest
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /realtime/v1/api
     plugins:
@@ -188,21 +198,21 @@ services:
 
   ## Analytics routes
   - name: analytics-v1
-    _comment: "Analytics: /analytics/v1/* -> http://analytics:4000/*"
+    _comment: 'Analytics: /analytics/v1/* -> http://analytics:4000/*'
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /analytics/v1/
 
   ## Secure Database routes
   - name: meta
-    _comment: "pg-meta: /pg/* -> http://meta:8080/*"
+    _comment: 'pg-meta: /pg/* -> http://meta:8080/*'
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /pg/
     plugins:
@@ -217,11 +227,11 @@ services:
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
-    _comment: "Studio: /* -> http://studio:3000/*"
+    _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
-        strip_path: true # Keep as true
+        strip_path: true
         paths:
           - /
     plugins:
