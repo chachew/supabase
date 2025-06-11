@@ -47,6 +47,7 @@ services:
           - /auth/v1/verify # Explicitly list public paths
           - /auth/v1/signup
           - /auth/v1/magiclink
+          - /auth/v1/recover
           # Add any other specific auth paths that should NOT require authentication here
         strip_path: false # Crucial: Kong passes the full path to GoTrue
         plugins: # <<--- ONLY list plugins that ARE active for this route (just CORS here)
