@@ -34,55 +34,41 @@ basicauth_credentials:
 ### API Routes
 ###
 services:
-  ## Open Auth routes
-  - name: auth-v1-open
-    url: http://$AUTH_HOST:9999/verify
-    routes:
-      - name: auth-v1-open
-        strip_path: true
-        paths:
-          - /auth/v1/verify
-    plugins:
-      - name: cors
-  - name: auth-v1-open-callback
-    url: http://$AUTH_HOST:9999/callback
-    routes:
-      - name: auth-v1-open-callback
-        strip_path: true
-        paths:
-          - /auth/v1/callback
-    plugins:
-      - name: cors
-  - name: auth-v1-open-authorize
-    url: http://$AUTH_HOST:9999/authorize
-    routes:
-      - name: auth-v1-open-authorize
-        strip_path: true
-        paths:
-          - /auth/v1/authorize
-    plugins:
-      - name: cors
-
-  ## Secure Auth routes
-  - name: auth-v1
+  ## GoTrue: /auth/v1/* -> http://auth:9999/*
+  - name: auth-v1 # This service will now handle ALL /auth/v1/ routes
     _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
-    url: http://$AUTH_HOST:9999/
+    url: http://$AUTH_HOST:9999/ # Base URL for GoTrue
     routes:
-      - name: auth-v1-all
-        strip_path: true
+      # NEW ROUTE: For public/unauthenticated auth paths (like /verify, /signup, /magiclink)
+      # This route MUST be defined *before* the more general 'auth-v1-all' route below,
+      # so it gets matched first for these specific public paths.
+      - name: auth-v1-public-unauth
         paths:
-          - /auth/v1/
-    plugins:
-      - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: false
-      - name: acl
-        config:
-          hide_groups_header: true
-          allow:
-            - admin
-            - anon
+          - /auth/v1/verify # Explicitly list public paths
+          - /auth/v1/signup
+          - /auth/v1/magiclink
+          # Add any other specific auth paths that should NOT require authentication here
+        strip_path: false # Crucial: Kong passes the full path to GoTrue
+        plugins: # <<--- ONLY list plugins that ARE active for this route (just CORS here)
+          - name: cors # Keep CORS for frontend
+          # key-auth and acl are *NOT* listed here because they are not applied to this public route
+
+      # MODIFIED EXISTING ROUTE: For all other /auth/v1/ paths (that need authentication)
+      - name: auth-v1-all
+        strip_path: false # <<--- CHANGED THIS FROM 'true' in original
+        paths:
+          - /auth/v1/ # This general path will catch all other /auth/v1/ sub-paths
+        plugins:
+          - name: cors
+          - name: key-auth # These plugins remain active for this general route
+            config:
+              hide_credentials: false
+          - name: acl
+            config:
+              hide_groups_header: true
+              allow:
+                - admin
+                - anon
 
   ## Secure REST routes
   - name: rest-v1
@@ -90,7 +76,7 @@ services:
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /rest/v1/
     plugins:
@@ -111,7 +97,7 @@ services:
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /graphql/v1
     plugins:
@@ -138,7 +124,7 @@ services:
     protocol: ws
     routes:
       - name: realtime-v1-ws
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /realtime/v1/
     plugins:
@@ -158,7 +144,7 @@ services:
     protocol: http
     routes:
       - name: realtime-v1-rest
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /realtime/v1/api
     plugins:
@@ -173,6 +159,7 @@ services:
             - admin
             - anon
   # ## Storage routes: the storage server manages its own auth
+  # # Commented out as they were in your original, if you need them, uncomment and configure
   # - name: storage-v1
   #   _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
   #   url: http://storage:5000/
@@ -185,6 +172,7 @@ services:
   #     - name: cors
 
   # ## Edge Functions routes
+  # # Commented out as they were in your original, if you need them, uncomment and configure
   # - name: functions-v1
   #   _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
   #   url: http://functions:9000/
@@ -202,7 +190,7 @@ services:
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /analytics/v1/
 
@@ -212,7 +200,7 @@ services:
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /pg/
     plugins:
@@ -231,7 +219,7 @@ services:
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
-        strip_path: true
+        strip_path: true # Keep as true
         paths:
           - /
     plugins:
