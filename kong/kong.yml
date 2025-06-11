@@ -39,7 +39,7 @@ services:
     url: http://$AUTH_HOST:9999/verify
     routes:
       - name: auth-v1-open
-        strip_path: false
+        strip_path: true
         paths:
           - /auth/v1/verify
     plugins:
@@ -48,7 +48,7 @@ services:
     url: http://$AUTH_HOST:9999/callback
     routes:
       - name: auth-v1-open-callback
-        strip_path: false
+        strip_path: true
         paths:
           - /auth/v1/callback
     plugins:
@@ -57,7 +57,7 @@ services:
     url: http://$AUTH_HOST:9999/authorize
     routes:
       - name: auth-v1-open-authorize
-        strip_path: false
+        strip_path: true
         paths:
           - /auth/v1/authorize
     plugins:
@@ -69,20 +69,20 @@ services:
     url: http://$AUTH_HOST:9999/
     routes:
       - name: auth-v1-all
-        strip_path: false
+        strip_path: true
         paths:
           - /auth/v1/
     plugins:
       - name: cors
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: false
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
-      #       - anon
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
 
   ## Secure REST routes
   - name: rest-v1
@@ -90,20 +90,20 @@ services:
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
-        strip_path: false
+        strip_path: true
         paths:
           - /rest/v1/
     plugins:
       - name: cors
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: true
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
-      #       - anon
+      - name: key-auth
+        config:
+          hide_credentials: true
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -111,25 +111,25 @@ services:
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
-        strip_path: false
+        strip_path: true
         paths:
           - /graphql/v1
     plugins:
       - name: cors
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: true
+      - name: key-auth
+        config:
+          hide_credentials: true
       - name: request-transformer
         config:
           add:
             headers:
               - Content-Profile:graphql_public
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
-      #       - anon
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
 
   ## Secure Realtime routes
   - name: realtime-v1-ws
@@ -138,47 +138,47 @@ services:
     protocol: ws
     routes:
       - name: realtime-v1-ws
-        strip_path: false
+        strip_path: true
         paths:
           - /realtime/v1/
     plugins:
       - name: cors
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: false
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
-      #       - anon
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://$REALTIME_HOST:4000/api
     protocol: http
     routes:
       - name: realtime-v1-rest
-        strip_path: false
+        strip_path: true
         paths:
           - /realtime/v1/api
     plugins:
       - name: cors
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: false
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
-      #       - anon
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
   # ## Storage routes: the storage server manages its own auth
   # - name: storage-v1
   #   _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
   #   url: http://storage:5000/
   #   routes:
   #     - name: storage-v1-all
-  #       strip_path: false
+  #       strip_path: true
   #       paths:
   #         - /storage/v1/
   #   plugins:
@@ -190,7 +190,7 @@ services:
   #   url: http://functions:9000/
   #   routes:
   #     - name: functions-v1-all
-  #       strip_path: false
+  #       strip_path: true
   #       paths:
   #         - /functions/v1/
   #   plugins:
@@ -202,7 +202,7 @@ services:
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
-        strip_path: false
+        strip_path: true
         paths:
           - /analytics/v1/
 
@@ -212,18 +212,18 @@ services:
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
-        strip_path: false
+        strip_path: true
         paths:
           - /pg/
     plugins:
-      # - name: key-auth
-      #   config:
-      #     hide_credentials: false
-      # - name: acl
-      #   config:
-      #     hide_groups_header: true
-      #     allow:
-      #       - admin
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
@@ -231,11 +231,11 @@ services:
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
-        strip_path: false
+        strip_path: true
         paths:
           - /
     plugins:
       - name: cors
-      # - name: basic-auth
-      #   config:
-      #     hide_credentials: true
+      - name: basic-auth
+        config:
+          hide_credentials: true
