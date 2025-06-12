@@ -231,13 +231,16 @@ services:
           allow:
             - admin
 
-  ## Protected Dashboard - catch all remaining routes
+  ## Protected Dashboard - accessible only via studio.mysite.com (or env var)
   - name: dashboard
     _comment: "Studio: /* -> http://studio:3000/*"
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
         strip_path: true
+        # Use an environment variable here!
+        hosts:
+          - $DASHBOARD_EXTERNAL_HOST # This will be replaced by Railway
         paths:
           - /
     plugins:
