@@ -1,5 +1,29 @@
-_format_version: '2.1'
+_format_version: "2.1"
 _transform: true
+
+###
+### GLOBAL PLUGINS
+### Applying CORS here means it will affect all services and routes
+### unless specifically overridden at a service or route level.
+###
+plugins:
+  - name: cors
+    # You can add global CORS configurations here if needed,
+    # for example:
+    # config:
+    #   origins:
+    #     - "*"
+    #   methods:
+    #     - GET
+    #     - POST
+    #     - PUT
+    #     - DELETE
+    #     - PATCH
+    #   headers:
+    #     - "Content-Type"
+    #     - "Authorization"
+    #   credentials: true
+    #   max_age: 3600
 
 ###
 ### Consumers / Users
@@ -42,8 +66,6 @@ services:
         strip_path: true
         paths:
           - /auth/v1/verify
-    plugins:
-      - name: cors
   - name: auth-v1-open-callback
     url: http://$AUTH_HOST:9999/callback
     routes:
@@ -51,8 +73,6 @@ services:
         strip_path: true
         paths:
           - /auth/v1/callback
-    plugins:
-      - name: cors
   - name: auth-v1-open-authorize
     url: http://$AUTH_HOST:9999/authorize
     routes:
@@ -60,12 +80,10 @@ services:
         strip_path: true
         paths:
           - /auth/v1/authorize
-    plugins:
-      - name: cors
 
   ## Secure Auth routes
   - name: auth-v1
-    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
+    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
     url: http://$AUTH_HOST:9999/
     routes:
       - name: auth-v1-all
@@ -73,7 +91,6 @@ services:
         paths:
           - /auth/v1/
     plugins:
-      - name: cors
       - name: key-auth
         config:
           hide_credentials: false
@@ -83,10 +100,9 @@ services:
           allow:
             - admin
             - anon
-
   ## Secure REST routes
   - name: rest-v1
-    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
+    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
     url: http://$REST_HOST:3000/
     routes:
       - name: rest-v1-all
@@ -94,7 +110,6 @@ services:
         paths:
           - /rest/v1/
     plugins:
-      - name: cors
       - name: key-auth
         config:
           hide_credentials: true
@@ -104,10 +119,9 @@ services:
           allow:
             - admin
             - anon
-
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
+    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
     url: http://$REST_HOST:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
@@ -115,7 +129,6 @@ services:
         paths:
           - /graphql/v1
     plugins:
-      - name: cors
       - name: key-auth
         config:
           hide_credentials: true
@@ -130,10 +143,9 @@ services:
           allow:
             - admin
             - anon
-
   ## Secure Realtime routes
   - name: realtime-v1-ws
-    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
     url: http://$REALTIME_HOST:4000/socket
     protocol: ws
     routes:
@@ -142,7 +154,6 @@ services:
         paths:
           - /realtime/v1/
     plugins:
-      - name: cors
       - name: key-auth
         config:
           hide_credentials: false
@@ -153,7 +164,7 @@ services:
             - admin
             - anon
   - name: realtime-v1-rest
-    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
     url: http://$REALTIME_HOST:4000/api
     protocol: http
     routes:
@@ -162,7 +173,6 @@ services:
         paths:
           - /realtime/v1/api
     plugins:
-      - name: cors
       - name: key-auth
         config:
           hide_credentials: false
@@ -181,8 +191,6 @@ services:
   #       strip_path: true
   #       paths:
   #         - /storage/v1/
-  #   plugins:
-  #     - name: cors
 
   # ## Edge Functions routes
   # - name: functions-v1
@@ -193,12 +201,10 @@ services:
   #       strip_path: true
   #       paths:
   #         - /functions/v1/
-  #   plugins:
-  #     - name: cors
 
   ## Analytics routes
   - name: analytics-v1
-    _comment: 'Analytics: /analytics/v1/* -> http://analytics:4000/*'
+    _comment: "Analytics: /analytics/v1/* -> http://analytics:4000/*"
     url: http://$ANALYTICS_HOST:4000/
     routes:
       - name: analytics-v1-all
@@ -208,7 +214,7 @@ services:
 
   ## Secure Database routes
   - name: meta
-    _comment: 'pg-meta: /pg/* -> http://meta:8080/*'
+    _comment: "pg-meta: /pg/* -> http://meta:8080/*"
     url: http://$META_HOST:8080/
     routes:
       - name: meta-all
@@ -227,7 +233,7 @@ services:
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
-    _comment: 'Studio: /* -> http://studio:3000/*'
+    _comment: "Studio: /* -> http://studio:3000/*"
     url: http://$STUDIO_HOST:3000/
     routes:
       - name: dashboard-all
@@ -235,7 +241,6 @@ services:
         paths:
           - /
     plugins:
-      - name: cors
       - name: basic-auth
         config:
           hide_credentials: true
